@@ -31,12 +31,19 @@ namespace WorldGenerator
 		CELL_TYPE_COUNT,
 		Interactable,
 		Default,
+		Empty,
 	};
 
 	// Basic struct to hold cell information
 	struct Cell
 	{
-		Cell() = default;
+		Cell()
+		{
+			Depth = 0;
+			Passable = false;
+			Type = CellType::Empty;
+		}
+
 		Cell(int depth, bool passable, CellType type)
 		{
 			Depth = depth;
@@ -114,7 +121,7 @@ namespace WorldGenerator
 		std::vector<Cell> m_Cells;
 	};
 
-	class CellGrid
+	class WorldGrid
 	{
 	public:
 		int RowCount()const

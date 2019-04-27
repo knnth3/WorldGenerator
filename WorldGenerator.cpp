@@ -6,6 +6,7 @@
 using namespace WorldGenerator;
 using namespace std;
 
+void PrintGrid(WorldGrid& grid);
 void PrintCell(CellType type);
 
 int main()
@@ -14,22 +15,32 @@ int main()
 	if (CellSetLibrary::CreateCellSet("grasslands", Cell(0, true, CellType::Ground)))
 	{
 		int seed = 0;
-		CellGrid Grid;
-		LandmarkTemplate landmark(10, 20, 10, 20, "grasslands");
-		if (landmark.GenerateLandmark(Grid, seed))
+		WorldGrid grid;
+		//LandmarkTemplate landmark(10, 20, 10, 20, "grasslands");
+		//if (landmark.GenerateLandmark(Grid, seed))
+		//{
+		//	cout << "-----Landmark: [" << Grid.RowCount() << ", " << Grid.ColumnCount() << "]-----" << endl;
+
+		//}
+
+		Generator myGenerator("grasslands");
+		if (myGenerator.GenerateMap(grid, seed))
 		{
-			cout << "-----Landmark: [" << Grid.RowCount() << ", " << Grid.ColumnCount() << "]-----" << endl;
-
-			for (int y = 0; y < Grid.ColumnCount(); y++)
-			{
-				for (int x = 0; x < Grid.RowCount(); x++)
-				{
-					PrintCell(Grid[x][y].Type);
-				}
-
-				cout << endl;
-			}
+			PrintGrid(grid);
 		}
+	}
+}
+
+void PrintGrid(WorldGrid& grid)
+{
+	for (int y = grid.ColumnCount() - 1; y >= 0; y--)
+	{
+		for (int x = 0; x < grid.RowCount(); x++)
+		{
+			PrintCell(grid[x][y].Type);
+		}
+
+		cout << endl;
 	}
 }
 
@@ -64,23 +75,8 @@ void PrintCell(CellType type)
 	case WorldGenerator::CellType::BLCornerWall:
 		cout << "\\";
 		break;
-	case WorldGenerator::CellType::LeftCliff:
-		break;
-	case WorldGenerator::CellType::RightCliff:
-		break;
-	case WorldGenerator::CellType::TopCliff:
-		break;
-	case WorldGenerator::CellType::BottomCliff:
-		break;
-	case WorldGenerator::CellType::TRCornerCliff:
-		break;
-	case WorldGenerator::CellType::TLCornerCliff:
-		break;
-	case WorldGenerator::CellType::BRCornerCliff:
-		break;
-	case WorldGenerator::CellType::BLCornerCliff:
-		break;
 	default:
+		cout << " ";
 		break;
 	}
 }

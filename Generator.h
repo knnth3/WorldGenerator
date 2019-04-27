@@ -9,9 +9,9 @@ namespace WorldGenerator
 	class Generator
 	{
 	public:
-		Generator();
+		Generator(std::string cellSetName);
 
-		bool GenerateMap(CellGrid& grid, unsigned int seed = 0);
+		bool GenerateMap(WorldGrid& grid, unsigned int seed = 0);
 
 		void SetMapSize(int rows, int columns);
 		void SetMaxPathLength(int length);
@@ -25,22 +25,28 @@ namespace WorldGenerator
 		class Walker
 		{
 		public:
-			Walker(CellGrid& grid, int maxLength, std::pair<int, int> dimensions, std::pair<int, int> location);
+			Walker(WorldGrid& grid, int maxLength, std::pair<int, int> dimensions, std::pair<int, int> location, std::pair<int, int> direction, CellSet* cellSetName);
 			bool Update(std::mt19937& rng);
 			std::pair<int, int> GetLocaton()const;
+			std::pair<int, int> GetDirection()const;
 
 		private:
+			std::vector<unsigned int> GetAvailableDirections();
+			std::pair<int, int> GetDirectionVector(unsigned int direction);
 
 			int m_MaxLength;
 			int m_CurrentPathLength;
-			CellGrid* m_Grid;
+			WorldGrid* m_Grid;
+			CellSet* m_CellSet;
+			std::pair<int, int> m_Forward;
 			std::pair<int, int> m_Location;
 			std::pair<int, int> m_Dimensions;
 
 		};
 		
-		int m_MaxWalkers;
-		int m_MaxPathLenth;
+		unsigned int m_MaxWalkers;
+		unsigned int m_MaxPathLenth;
+		CellSet* m_CurrentCellSet;
 		std::pair<int, int> m_MapDimensions;
 	};
 }

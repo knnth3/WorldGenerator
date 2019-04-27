@@ -47,7 +47,7 @@ namespace WorldGenerator
 	}
 
 	// Generates an array for the current alloted space using a non-zero seed
-	bool LandmarkTemplate::GenerateLandmark(CellGrid& grid, unsigned int seed)
+	bool LandmarkTemplate::GenerateLandmark(WorldGrid& grid, unsigned int seed)
 	{
 		// Make sure the cell set is valid
 		if (!m_CellSet)

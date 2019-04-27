@@ -14,7 +14,7 @@ namespace WorldGenerator
 		~LandmarkTemplate();
 
 		// Generates an array for the current alloted space using a non-zero seed
-		bool GenerateLandmark(CellGrid& grid, unsigned int seed = 0);
+		bool GenerateLandmark(WorldGrid& grid, unsigned int seed = 0);
 
 		// Sets the current cell set
 		void SetCellSet(std::string cellSet);
