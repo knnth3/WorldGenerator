@@ -1,7 +1,7 @@
 // Created by Eric Marquez. All rights reserved
 
 #include <iostream>
-#include "LandmarkTemplate.h"
+#include "Generator.h"
 
 using namespace WorldGenerator;
 using namespace std;
@@ -49,13 +49,13 @@ void PrintCell(CellType type)
 	case WorldGenerator::CellType::TopWall:
 		cout << "-";
 		break;
-	case WorldGenerator::CellType::BackWall:
+	case WorldGenerator::CellType::BottomWall:
 		cout << "-";
 		break;
 	case WorldGenerator::CellType::TRCornerWall:
 		cout << "\\";
 		break;
-	case WorldGenerator::CellType::TLCorcerWall:
+	case WorldGenerator::CellType::TLCornerWall:
 		cout << "/";
 		break;
 	case WorldGenerator::CellType::BRCornerWall:
@@ -70,7 +70,7 @@ void PrintCell(CellType type)
 		break;
 	case WorldGenerator::CellType::TopCliff:
 		break;
-	case WorldGenerator::CellType::BottmCliff:
+	case WorldGenerator::CellType::BottomCliff:
 		break;
 	case WorldGenerator::CellType::TRCornerCliff:
 		break;

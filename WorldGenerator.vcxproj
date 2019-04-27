@@ -151,13 +151,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="CellSetLibrary.cpp" />
+    <ClCompile Include="Generator.cpp" />
     <ClCompile Include="Interactable.cpp" />
     <ClCompile Include="LandmarkTemplate.cpp" />
     <ClCompile Include="WorldGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="CellSetLibrary.h" />
+    <ClInclude Include="Generator.h" />
     <ClInclude Include="Interactable.h" />
     <ClInclude Include="LandmarkTemplate.h" />
   </ItemGroup>

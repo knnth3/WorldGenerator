@@ -1,7 +1,7 @@
 #pragma once
 // Created by Eric Marquez. All rights reserved
 
-#include "Cell.h"
+#include "CellSetLibrary.h"
 #include "Interactable.h"
 
 namespace WorldGenerator
@@ -67,15 +67,23 @@ namespace WorldGenerator
 		// Gets an interactable at a given index
 		Interactable* GetInteractable(unsigned int index);
 
+		// Gets the exit positions generated for this Landmark
+		const std::vector<std::pair<int, int>>& GetExitPositions()const;
+
 		// Gets all interactrables
 		const std::vector<Interactable*>& GetInteractables()const;
 
 	private:
 
+		// Gets the border information
+		std::vector<CellType> GetBorderTypes(unsigned int elevation)const;
+
+		int m_PassageWayCount;
 		CellSet* m_CellSet;
 		std::pair<int, int> m_RowRange;
 		std::pair<int, int> m_ColumnRange;
 		std::pair<int, int> m_HeightRange;
 		std::vector<Interactable*> m_Interactables;
+		std::vector<std::pair<int, int>>m_ExitPositions;
 	};
 }

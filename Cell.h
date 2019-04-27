@@ -14,19 +14,21 @@ namespace WorldGenerator
 		LeftWall,
 		RightWall,
 		TopWall,
-		BackWall,
+		BottomWall,
 		TRCornerWall,
-		TLCorcerWall,
+		TLCornerWall,
 		BRCornerWall,
 		BLCornerWall,
 		LeftCliff,
 		RightCliff,
 		TopCliff,
-		BottmCliff,
+		BottomCliff,
 		TRCornerCliff,
 		TLCornerCliff,
 		BRCornerCliff,
 		BLCornerCliff,
+
+		CELL_TYPE_COUNT,
 		Interactable,
 		Default,
 	};
@@ -53,6 +55,7 @@ namespace WorldGenerator
 		CellSet(Cell defaultCell)
 		{
 			m_DefaultCell = defaultCell;
+			GenerateGenericSet();
 		}
 
 		CellSet(Cell defaultCell, std::vector<Cell> cells)
@@ -85,63 +88,30 @@ namespace WorldGenerator
 		}
 
 	private:
+		void GenerateGenericSet()
+		{
+			m_Cells.clear();
+			Cell newCell;
+
+			for (int index = 0; index < (unsigned int)CellType::CELL_TYPE_COUNT; index++)
+			{
+				newCell.Type = (CellType)index;
+				newCell.Depth = 0;
+
+				if (newCell.Type == CellType::Ground)
+					newCell.Passable = true;
+				else
+					newCell.Passable = false;
+
+				if (index >= (unsigned int)CellType::LeftCliff)
+					newCell.Depth = newCell.Depth + 1;
+				
+				m_Cells.push_back(newCell);
+			}
+		}
 
 		Cell m_DefaultCell;
 		std::vector<Cell> m_Cells;
-	};
-
-	class CellSetLibrary
-	{
-	public:
-
-		~CellSetLibrary()
-		{
-			std::cout << "Calling destructor" << std::endl;
-			RemoveAllSets();
-		}
-
-		static CellSet* GetCellSet(std::string uniqueName)
-		{
-			// Found
-			if (m_CellSets.find(uniqueName) != m_CellSets.end())
-			{
-				return m_CellSets[uniqueName];
-			}
-
-			return nullptr;
-		}
-
-		static bool CreateCellSet(std::string uniqueName, Cell defaultCell)
-		{
-			return CreateCellSet(uniqueName, defaultCell, std::vector<Cell>());
-		}
-
-		static bool CreateCellSet(std::string uniqueName, Cell defaultCell, std::vector<Cell> cells)
-		{
-			// Found
-			if (m_CellSets.find(uniqueName) != m_CellSets.end())
-			{
-				return false;
-			}
-
-			m_CellSets[uniqueName] = new CellSet(defaultCell, cells);
-
-			return true;
-		}
-
-		static void RemoveAllSets()
-		{
-			for (auto& set : m_CellSets)
-			{
-				delete set.second;
-			}
-
-			m_CellSets.clear();
-		}
-
-	private:
-
-		static std::map<std::string, CellSet*> m_CellSets;
 	};
 
 	class CellGrid

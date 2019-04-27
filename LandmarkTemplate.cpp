@@ -6,6 +6,18 @@
 
 namespace WorldGenerator
 {
+	enum CellPosition
+	{
+		LEFT,
+		RIGHT,
+		TOP,
+		BOTTOM,
+		TRCORNER,
+		TLCORNER,
+		BRCORNER,
+		BLCORNER,
+	};
+
 	// Define defaults
 	LandmarkTemplate::LandmarkTemplate()
 	{
@@ -13,6 +25,7 @@ namespace WorldGenerator
 		m_ColumnRange = std::make_pair(0, 0);
 		m_HeightRange = std::make_pair(0, 0);
 		m_CellSet = nullptr;
+		m_PassageWayCount = 1;
 	}
 
 	// Extra for ease of acess
@@ -22,6 +35,7 @@ namespace WorldGenerator
 		m_ColumnRange = std::make_pair(0, 0);
 		m_HeightRange = std::make_pair(0, 0);
 		m_CellSet = nullptr;
+		m_PassageWayCount = 1;
 
 		SetDefaults(minRowSize, maxRowSize, minColumnSize, maxColumnSize, cellSetName);
 	}
@@ -58,9 +72,22 @@ namespace WorldGenerator
 		// distribution in range [elevationMin, elevationMax]
 		std::uniform_int_distribution<std::mt19937::result_type> heightDistribution(m_HeightRange.first, m_HeightRange.second);
 
+		// distribution in range [exit1, exit4]
+		std::uniform_int_distribution<std::mt19937::result_type> exit1CountDistribution(0, 1);
+		std::uniform_int_distribution<std::mt19937::result_type> exit2CountDistribution(0, 1);
+		std::uniform_int_distribution<std::mt19937::result_type> exit3CountDistribution(0, 1);
+		std::uniform_int_distribution<std::mt19937::result_type> exit4CountDistribution(0, 1);
+
 		int rowCount = rowDistribution(rng);
 		int columnCount = rowDistribution(rng);
 		int startDepth = heightDistribution(rng);
+		int exit1 = exit1CountDistribution(rng);
+		int exit2 = exit2CountDistribution(rng);
+		int exit3 = exit3CountDistribution(rng);
+		int exit4 = exit4CountDistribution(rng);
+
+		// Get the correct cell type for the current settings
+		std::vector<CellType> cellTypes = GetBorderTypes(startDepth);
 
 		// Start generation process
 		grid.resize(rowCount);
@@ -69,8 +96,68 @@ namespace WorldGenerator
 			grid[x].resize(columnCount);
 			for (int y = 0; y < columnCount; y++)
 			{
-				grid[x][y] = m_CellSet->GetCell(CellType::Default);
+				Cell current = m_CellSet->GetCell(CellType::Default);
 
+				// top right corner
+				if (x == 0 && y == 0)
+				{
+					current = m_CellSet->GetCell(cellTypes[TLCORNER]);
+				}
+				else if (x == rowCount - 1 && y == 0)
+				{
+					current = m_CellSet->GetCell(cellTypes[TRCORNER]);
+				}
+				else if (x == rowCount - 1 && y == columnCount - 1)
+				{
+					current = m_CellSet->GetCell(cellTypes[BRCORNER]);
+				}
+				else if (x == 0 && y == columnCount - 1)
+				{
+					current = m_CellSet->GetCell(cellTypes[BLCORNER]);
+				}
+				else if (x != rowCount / 2 && y != columnCount / 2 && !(x == (rowCount / 2) + 1 || x == (rowCount / 2) - 1) && !(y == (columnCount / 2) + 1 || y == (columnCount / 2) - 1))
+				{
+					if ((x == 0 || x == rowCount - 1))
+					{
+						current = m_CellSet->GetCell(cellTypes[LEFT]);
+					}
+					else if ((y == 0 || y == columnCount - 1))
+					{
+						current = m_CellSet->GetCell(cellTypes[BOTTOM]);
+					}
+				}
+				else if (x == rowCount / 2 || x == (rowCount / 2) + 1 || x == (rowCount / 2) - 1)
+				{
+					if (!exit1 && y == 0)
+					{
+						current = m_CellSet->GetCell(cellTypes[TOP]);
+					}
+					else if (!exit2 && y == columnCount - 1)
+					{
+						current = m_CellSet->GetCell(cellTypes[BOTTOM]);
+					}
+					else
+					{
+						current = m_CellSet->GetCell(CellType::Default);
+					}
+				}
+				else if (y == columnCount / 2 || y == (columnCount / 2) + 1 || y == (columnCount / 2) - 1)
+				{
+					if (!exit3 && x == 0)
+					{
+						current = m_CellSet->GetCell(cellTypes[LEFT]);
+					}
+					else if (!exit4 && x == rowCount - 1)
+					{
+						current = m_CellSet->GetCell(cellTypes[RIGHT]);
+					}
+					else
+					{
+						current = m_CellSet->GetCell(CellType::Default);
+					}
+				}
+
+				grid[x][y] = current;
 			}
 		}
 
@@ -193,9 +280,46 @@ namespace WorldGenerator
 		return nullptr;
 	}
 
+	// Gets the exit positions generated for this Landmark
+	const std::vector<std::pair<int, int>>& LandmarkTemplate::GetExitPositions() const
+	{
+		return m_ExitPositions;
+	}
+
 	// Gets all interactrables
 	const std::vector<Interactable*>& LandmarkTemplate::GetInteractables() const
 	{
 		return m_Interactables;
+	}
+
+	// Gets the border information
+	std::vector<CellType> LandmarkTemplate::GetBorderTypes(unsigned int elevation) const
+	{
+		std::vector<CellType> types;
+
+		if (elevation == 0)
+		{
+			types.push_back(CellType::LeftWall);
+			types.push_back(CellType::RightWall);
+			types.push_back(CellType::TopWall);
+			types.push_back(CellType::BottomWall);
+			types.push_back(CellType::TRCornerWall);
+			types.push_back(CellType::TLCornerWall);
+			types.push_back(CellType::BRCornerWall);
+			types.push_back(CellType::BLCornerWall);
+		}
+		else
+		{
+			types.push_back(CellType::LeftCliff);
+			types.push_back(CellType::RightCliff);
+			types.push_back(CellType::TopCliff);
+			types.push_back(CellType::BottomCliff);
+			types.push_back(CellType::TRCornerCliff);
+			types.push_back(CellType::TLCornerCliff);
+			types.push_back(CellType::BRCornerCliff);
+			types.push_back(CellType::BLCornerCliff);
+		}
+
+		return types;
 	}
 }
